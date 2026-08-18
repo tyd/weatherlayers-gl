@@ -11,4 +11,8 @@ layout(std140) uniform particleUniforms {
 
   float time;
   float seed;
+
+  vec2 viewportNearPoint;
+  float viewportNearBias;
+  float viewportNearRadius;
 } particle;
