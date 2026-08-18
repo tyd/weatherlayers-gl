@@ -51,14 +51,14 @@ export function getViewportBounds(viewport: WebMercatorViewport): [number, numbe
 }
 
 // pitched viewports starve the near field with bounds-uniform respawn; see particle-line-layer-update.vs.glsl
-export function getViewportNearField(viewport: WebMercatorViewport): {viewportNearPoint: [number, number], viewportNearBias: number, viewportNearRadius: number} | undefined {
-  if (!(viewport.pitch > 30)) {
+export function getViewportNearField(viewport: WebMercatorViewport, maxBias: number): {viewportNearPoint: [number, number], viewportNearBias: number, viewportNearRadius: number} | undefined {
+  if (!(viewport.pitch > 30) || !(maxBias > 0)) {
     return undefined;
   }
   const viewportNearPoint = viewport.unproject([viewport.width / 2, viewport.height * 0.85]) as [number, number];
   const viewportMidPoint = viewport.unproject([viewport.width / 2, viewport.height * 0.4]) as [number, number];
   const viewportNearRadius = distance(viewportNearPoint, viewportMidPoint);
-  const viewportNearBias = Math.min(0.6, (viewport.pitch - 30) / 60);
+  const viewportNearBias = maxBias * Math.min(1, (viewport.pitch - 30) / 30);
   return {viewportNearPoint, viewportNearBias, viewportNearRadius};
 }
 
