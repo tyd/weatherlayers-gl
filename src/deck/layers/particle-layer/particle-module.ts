@@ -14,6 +14,10 @@ export type ParticleModuleProps = {
 
   time: number;
   seed: number;
+
+  viewportNearPoint?: [number, number];
+  viewportNearBias?: number;
+  viewportNearRadius?: number;
 };
 
 type ParticleModuleUniforms = {[K in keyof typeof tokens]: any};
@@ -32,6 +36,10 @@ function getUniforms(props: Partial<ParticleModuleProps> = {}): ParticleModuleUn
 
     [tokens['time'] ?? 'time']: props.time,
     [tokens['seed'] ?? 'seed']: props.seed,
+
+    [tokens['viewportNearPoint'] ?? 'viewportNearPoint']: props.viewportNearPoint ?? [0, 0],
+    [tokens['viewportNearBias'] ?? 'viewportNearBias']: props.viewportNearBias ?? 0,
+    [tokens['viewportNearRadius'] ?? 'viewportNearRadius']: props.viewportNearRadius ?? 0,
   };
 }
 
@@ -52,6 +60,10 @@ export const particleModule = {
 
     [tokens['time'] ?? 'time']: 'f32',
     [tokens['seed'] ?? 'seed']: 'f32',
+
+    [tokens['viewportNearPoint'] ?? 'viewportNearPoint']: 'vec2<f32>',
+    [tokens['viewportNearBias'] ?? 'viewportNearBias']: 'f32',
+    [tokens['viewportNearRadius'] ?? 'viewportNearRadius']: 'f32',
   },
   getUniforms,
 } as const satisfies ShaderModule<ParticleModuleProps, ParticleModuleUniforms>;

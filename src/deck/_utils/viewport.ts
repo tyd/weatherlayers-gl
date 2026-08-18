@@ -50,6 +50,18 @@ export function getViewportBounds(viewport: WebMercatorViewport): [number, numbe
   return wrapBounds(viewport.getBounds());
 }
 
+// pitched viewports starve the near field with bounds-uniform respawn; see particle-line-layer-update.vs.glsl
+export function getViewportNearField(viewport: WebMercatorViewport): {viewportNearPoint: [number, number], viewportNearBias: number, viewportNearRadius: number} | undefined {
+  if (!(viewport.pitch > 30)) {
+    return undefined;
+  }
+  const viewportNearPoint = viewport.unproject([viewport.width / 2, viewport.height * 0.85]) as [number, number];
+  const viewportMidPoint = viewport.unproject([viewport.width / 2, viewport.height * 0.4]) as [number, number];
+  const viewportNearRadius = distance(viewportNearPoint, viewportMidPoint);
+  const viewportNearBias = Math.min(0.6, (viewport.pitch - 30) / 60);
+  return {viewportNearPoint, viewportNearBias, viewportNearRadius};
+}
+
 // viewport.zoom varies by latitude, using Math.log2(viewport.scale) instead because it is multiplied by scaleAdjust
 // TODO: report deck.gl bug
 export function getViewportZoom(viewport: Viewport): number {

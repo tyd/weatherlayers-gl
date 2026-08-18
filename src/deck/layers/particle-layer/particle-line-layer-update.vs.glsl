@@ -68,6 +68,13 @@ vec2 randPointToPosition(vec2 point) {
     float bearing = point.y * 360.;
     return destinationPoint(particle.viewportGlobeCenter, dist, bearing);
   } else {
+    // pitched viewports starve the near field; respawn a fraction of particles in a disk around the camera near point
+    if (particle.viewportNearBias > 0. && randFloat(point + 7.7) < particle.viewportNearBias) {
+      vec2 nearRand = randPoint(point + 3.3);
+      float dist = sqrt(nearRand.y) * particle.viewportNearRadius; // uniform in area
+      float bearing = nearRand.x * 360.;
+      return destinationPoint(particle.viewportNearPoint, dist, bearing);
+    }
     point.y = smoothstep(0., 1., point.y); // uniform random latitude
     vec2 viewportBoundsMin = particle.viewportBounds.xy;
     vec2 viewportBoundsMax = particle.viewportBounds.zw;
