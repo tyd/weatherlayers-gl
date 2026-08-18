@@ -49,6 +49,7 @@ type _ParticleLineLayerProps = LineLayerProps<unknown> & {
   numParticles: number;
   maxAge: number;
   speedFactor: number;
+  nearRespawnBias: number;
 
   width: number;
   animate: boolean;
@@ -76,6 +77,7 @@ const defaultProps: DefaultProps<ParticleLineLayerProps> = {
   numParticles: {type: 'number', min: 1, max: 1000000, value: 5000},
   maxAge: {type: 'number', min: 1, max: 255, value: 10},
   speedFactor: {type: 'number', min: 0, max: 50, value: 1},
+  nearRespawnBias: {type: 'number', min: 0, max: 1, value: 0.25},
 
   width: {type: 'number', value: DEFAULT_LINE_WIDTH},
   animate: true,
@@ -301,7 +303,7 @@ export class ParticleLineLayer<ExtraPropsT extends {} = {}> extends LineLayer<un
     }
 
     const {device, viewport, timeline} = this.context;
-    const {imageTexture, imageTexture2, imageSmoothing, imageInterpolation, imageWeight, imageType, imageUnscale, imageMinValue, imageMaxValue, bounds, color, maxAge, speedFactor} = ensureDefaultProps(this.props, defaultProps);
+    const {imageTexture, imageTexture2, imageSmoothing, imageInterpolation, imageWeight, imageType, imageUnscale, imageMinValue, imageMaxValue, bounds, color, maxAge, speedFactor, nearRespawnBias} = ensureDefaultProps(this.props, defaultProps);
     const {paletteTexture, paletteBounds, currentNumParticles, numAgedInstances, sourcePositions, targetPositions, sourceColors, targetColors, transform, previousViewportZoom, previousTime} = this.state;
     if (!imageTexture || typeof currentNumParticles !== 'number' || typeof numAgedInstances !== 'number' || !sourcePositions || !targetPositions || !sourceColors || !targetColors || !transform) {
       return;
@@ -317,7 +319,7 @@ export class ParticleLineLayer<ExtraPropsT extends {} = {}> extends LineLayer<un
     const viewportGlobeCenter = isViewportGlobe(viewport) ? getViewportGlobeCenter(viewport) : undefined;
     const viewportGlobeRadius = isViewportGlobe(viewport) ? getViewportGlobeRadius(viewport) : undefined;
     const viewportBounds = isViewportMercator(viewport) ? getViewportBounds(viewport) : undefined;
-    const viewportNearField = isViewportMercator(viewport) ? getViewportNearField(viewport) : undefined;
+    const viewportNearField = isViewportMercator(viewport) ? getViewportNearField(viewport, nearRespawnBias) : undefined;
     const viewportZoomChangeFactor = 2 ** ((typeof previousViewportZoom === 'number' ? previousViewportZoom - getViewportZoom(viewport) : 0) * 4);
 
     // speed factor for current zoom level
